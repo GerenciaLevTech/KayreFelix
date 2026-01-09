@@ -1,7 +1,7 @@
 /* ------------------------------------
 Arquivo: calendar.js
 Lógica do Calendário de Agendamento
-   ------------------------------------ */
+------------------------------------ */
 
 document.addEventListener("DOMContentLoaded", function () {
 	// --- Referências aos Elementos ---
@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	const alertCloseButton = document.getElementById("alert-close-button");
 
 	// --- Configurações ---
+	// Certifique-se de que esta URL é a do seu Backend Python (Vercel)
 	const API_URL = "https://calendar-production.vercel.app"; 
 	const workHours = {start: 9, end: 21};
 	let currentDay = new Date();
@@ -49,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		if (!modalElement) return;
 		modalElement.style.display = "none";
 		// Remove a classe apenas se NENHUM outro modal estiver visível
-		// Seleciona overlays que estão explicitamente com 'display: flex'
 		const anyModalOpen = document.querySelector(
 			'.modal-overlay[style*="display: flex"]'
 		);
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	async function renderCalendar(baseDate) {
 		if (!grid || !currentWeekDisplay || !prevWeekBtn || !nextWeekBtn) {
 			console.error("Elementos essenciais do calendário não encontrados.");
-			showCustomAlert("Erro ao carregar a estrutura do calendário."); // Informa o usuário
+			showCustomAlert("Erro ao carregar a estrutura do calendário."); 
 			return;
 		}
 
@@ -348,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		});
 	}
 
-	// Submit do Formulário de Agendamento
+	// --- CORREÇÃO PRINCIPAL NO SUBMIT ---
 	if (bookingForm) {
 		bookingForm.addEventListener("submit", async (event) => {
 			event.preventDefault();
@@ -374,6 +374,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			const submitButton = bookingForm.querySelector("button");
 			submitButton.textContent = "Agendando...";
 			submitButton.disabled = true;
+			
 			try {
 				const response = await fetch(`${API_URL}/api/agendar`, {
 					method: "POST",
@@ -399,27 +400,34 @@ document.addEventListener("DOMContentLoaded", function () {
 						// Outros erros do servidor
 						throw new Error(errorMsg);
 					}
-					return; // Importante sair aqui após tratar o erro
+					return;
 				}
 
 				const result = await response.json();
 				closeModal(bookingModal);
-				const mensagem = encodeURIComponent(
-					`Olá! Confirmei agendamento ${formData.get("date")} ${formData.get(
-						"time"
-					)}. Nome ${formData.get("nome")}.`
-				);
+
+				// --- AQUI ESTÁ A CORREÇÃO ---
+				// Não criamos a mensagem aqui. Usamos o link que o Python enviou.
+				
 				showCustomAlert(
 					"Agendamento confirmado! Redirecionando para o WhatsApp...",
 					() => {
-						calendarRendered = false; // Força recarregar calendário na próxima abertura
+						calendarRendered = false;
 						setTimeout(() => {
-							window.location.href = `https://wa.me/${result.whatsappNumber}?text=${mensagem}`;
+							// Verificação de segurança caso o link não venha
+							if (result.whatsappLink) {
+								window.location.href = result.whatsappLink;
+							} else {
+								console.error("ERRO: Link do WhatsApp não retornado pelo servidor.");
+								// Fallback (último recurso)
+								window.location.href = "https://wa.me/5511937244363"; 
+							}
 						}, 500);
 					}
 				);
+				// ----------------------------
+
 			} catch (error) {
-				// Erros de rede ou erros lançados manualmente
 				showCustomAlert(
 					error.message ||
 						"Ocorreu um erro inesperado ao agendar. Verifique sua conexão."
@@ -435,4 +443,4 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	console.log("Script calendar.js carregado e pronto.");
-}); // Fim do DOMContentLoaded
+});
