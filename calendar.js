@@ -30,8 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Configurações ---
     // ATENÇÃO: Verifique se esta URL está correta para seu ambiente (local ou produção)
-    const API_URL = 'https://agenda-kayre.vercel.app'; // <<-- SUA URL DE PRODUÇÃO
-    //const API_URL = 'http://127.0.0.1:5000'; // Descomente para testes locais
+    const API_URL = 'https://agenda-kayre.vercel.app';
     const workHours = { start: 9, end: 21 };
     let currentDay = new Date();
     let alertCallback = null;
