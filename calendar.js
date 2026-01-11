@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Configurações ---
     // ATENÇÃO: Verifique se esta URL está correta para seu ambiente (local ou produção)
-    const API_URL = 'https://calendar-production-b0b3tz4ra-lusk1357s-projects.vercel.app/';
+    const API_URL = 'https://calendar-production.vercel.app';
     const workHours = { start: 9, end: 21 };
     let currentDay = new Date();
     let alertCallback = null;
